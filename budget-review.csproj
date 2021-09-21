@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net5.0</TargetFramework>
+    <RootNamespace>BudgetReview</RootNamespace>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Gathering\" />
+    <None Remove="CsvHelper" />
+    <None Remove="Parsing\" />
+    <None Remove="Analyzing\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Gathering\" />
+    <Folder Include="Parsing\" />
+    <Folder Include="Analyzing\" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="CsvHelper" Version="27.1.1" />
+  </ItemGroup>
+</Project>
