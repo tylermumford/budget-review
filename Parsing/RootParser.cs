@@ -32,6 +32,9 @@ namespace BudgetReview.Parsing
                 case Source.CitiCard:
                     itemResult = SourceParser<CitiCardLineItem>.Parse(item, Source.CitiCard);
                     goto invert;
+                case Source.ChaseCard:
+                    itemResult = SourceParser<ChaseCardLineItem>.Parse(item, Source.ChaseCard);
+                    goto invert;
                 default:
                     throw new NotImplementedException();
 

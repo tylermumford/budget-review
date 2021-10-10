@@ -2,9 +2,10 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
+using static BudgetReview.Gathering.MacuGatherer;
 using static BudgetReview.Gathering.AmazonGatherer;
 using static BudgetReview.Gathering.CitiCardGatherer;
-using static BudgetReview.Gathering.MacuGatherer;
+using static BudgetReview.Gathering.ChaseCardGatherer;
 
 namespace BudgetReview.Gathering
 {
@@ -29,6 +30,7 @@ namespace BudgetReview.Gathering
             AddMacuTransactions(result);
             AddAmazonTransactions(result, dir);
             AddCitiCardTransactions(result);
+            AddChaseCardTransactions(result);
             return Task.FromResult(result);
         }
     }
