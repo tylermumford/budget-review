@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using BudgetReview.Analyzing;
@@ -44,12 +45,19 @@ namespace BudgetReview
 
             Console.WriteLine("Analyzed all data");
             Console.WriteLine(analysis.GetDisplayString());
+
+            Debug.WriteLine("\n## Creating output file...");
+
+            analysis.WriteToFile();
+
+            Console.WriteLine("Created output file");
         }
 
         private static void EmitDebugInfo()
         {
             Debug.WriteLine($"Current culture: {CultureInfo.CurrentCulture}");
             Debug.WriteLine($"Current UI culture: {CultureInfo.CurrentUICulture}");
+            Debug.WriteLine($"Current directory: {Directory.GetCurrentDirectory()}");
         }
 
         private static void ConfigureLogging()

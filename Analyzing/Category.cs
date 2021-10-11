@@ -7,6 +7,11 @@ namespace BudgetReview.Analyzing
     {
         public string Name { get; private set; }
 
+        public override string ToString()
+        {
+            return Name ?? "<unset category>";
+        }
+
         public static Category Uncategorized { get; } = new("Uncategorized");
 
         /// <summary>
