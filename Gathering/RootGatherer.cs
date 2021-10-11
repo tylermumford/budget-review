@@ -17,7 +17,7 @@ namespace BudgetReview.Gathering
             return FromLocalFolder(Constants.RawDataDir);
         }
 
-        private static Task<DataSet<RawDataItem>> FromLocalFolder(string dir)
+        private static async Task<DataSet<RawDataItem>> FromLocalFolder(string dir)
         {
             if (!Directory.Exists(dir))
             {
@@ -27,11 +27,11 @@ namespace BudgetReview.Gathering
             Debug.WriteLine($"{Directory.GetFiles(dir).Length} files in {dir}");
 
             var result = new DataSet<RawDataItem>();
-            AddMacuTransactions(result);
+            await AddMacuTransactionsAsync(result);
             AddAmazonTransactions(result, dir);
             AddCitiCardTransactions(result);
             AddChaseCardTransactions(result);
-            return Task.FromResult(result);
+            return result;
         }
     }
 }

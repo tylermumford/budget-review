@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using CsvHelper.Configuration.Attributes;
 
 namespace BudgetReview.Parsing

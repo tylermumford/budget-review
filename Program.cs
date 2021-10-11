@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -15,6 +15,7 @@ namespace BudgetReview
         static async Task Main(string[] args)
         {
             ConfigureLogging();
+            Env.Load();
 
             Console.WriteLine("# Budget Review");
 
@@ -58,6 +59,7 @@ namespace BudgetReview
             Debug.WriteLine($"Current culture: {CultureInfo.CurrentCulture}");
             Debug.WriteLine($"Current UI culture: {CultureInfo.CurrentUICulture}");
             Debug.WriteLine($"Current directory: {Directory.GetCurrentDirectory()}");
+            Debug.WriteLine($"Env file parsed: {Env.Get("env_file_parsed", "No")}");
         }
 
         private static void ConfigureLogging()

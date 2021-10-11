@@ -1,4 +1,4 @@
-﻿namespace BudgetReview.Gathering
+namespace BudgetReview.Gathering
 {
     internal static class CitiCardGatherer
     {
