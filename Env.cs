@@ -26,10 +26,7 @@ namespace BudgetReview
             var fileContents = LoadRawFile(".env");
             PopulateDictionary(fileContents);
 
-            foreach (var item in Values.Keys)
-            {
-                Debug.WriteLine("Env key: " + item);
-            }
+            Debug.WriteLine("Env keys loaded: " + string.Join(", ", Values.Keys));
         }
 
         private static string[] LoadRawFile(string name)
