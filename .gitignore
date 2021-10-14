@@ -3,3 +3,4 @@ obj
 .vs
 Budget-Review-Analysis-*
 .env
+*.csv
