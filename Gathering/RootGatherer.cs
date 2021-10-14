@@ -33,6 +33,9 @@ namespace BudgetReview.Gathering
             var tasks = new List<Task>();
             foreach (var g in gatherers)
             {
+                // Note: This is not thread-safe, because DataSet doesn't synchronize its
+                // underlying List. Add synchronization or have GatherInto return results
+                // that get merged on one thread.
                 tasks.Add(g.GatherInto(result));
             }
             Task.WaitAll(tasks.ToArray());
