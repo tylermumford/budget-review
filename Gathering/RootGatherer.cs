@@ -6,31 +6,41 @@ using static BudgetReview.Gathering.MacuGatherer;
 using static BudgetReview.Gathering.AmazonGatherer;
 using static BudgetReview.Gathering.CitiCardGatherer;
 using static BudgetReview.Gathering.ChaseCardGatherer;
+using System.Collections.Generic;
 
 namespace BudgetReview.Gathering
 {
     internal class RootGatherer
     {
+        private List<IGatherer> gatherers = new();
 
         public Task<DataSet<RawDataItem>> Start()
         {
-            return FromLocalFolder(Constants.RawDataDir);
+            InstantiateGatherers();
+            return GatherAll();
         }
 
-        private static async Task<DataSet<RawDataItem>> FromLocalFolder(string dir)
+        private void InstantiateGatherers()
         {
-            if (!Directory.Exists(dir))
-            {
-                throw new ArgumentException("directory doesn't exist", nameof(dir));
-            }
+            gatherers.Add(new MacuGatherer());
+            gatherers.Add(new AmazonGatherer());
+        }
 
-            Debug.WriteLine($"{Directory.GetFiles(dir).Length} files in {dir}");
-
+        private async Task<DataSet<RawDataItem>> GatherAll()
+        {
             var result = new DataSet<RawDataItem>();
-            await AddMacuTransactionsAsync(result);
-            AddAmazonTransactions(result, dir);
+
+            var tasks = new List<Task>();
+            foreach (var g in gatherers)
+            {
+                tasks.Add(g.GatherInto(result));
+            }
+            Task.WaitAll(tasks.ToArray());
+
             AddCitiCardTransactions(result);
             AddChaseCardTransactions(result);
+
+            await (await BrowserAutomationGatherer.GetInstance()).DisposeAsync();
             return result;
         }
     }
