@@ -2,7 +2,7 @@ using System;
 using System.Threading.Tasks;
 using System.Threading;
 using Microsoft.Playwright;
-using System.Diagnostics;
+using Serilog;
 
 namespace BudgetReview.Gathering
 {
@@ -21,20 +21,22 @@ namespace BudgetReview.Gathering
             browser = b;
         }
 
+        public static bool HasInstance { get => instance != null; }
+
         public static async Task<BrowserAutomationGatherer> GetInstance()
         {
             if (instance != null)
                 return instance;
 
-            await instanceGuard.WaitAsync();
-
-            if (instance != null)
-                return instance;
-
-            Debug.WriteLine("Creating brand new BrowserAutomationGatherer");
-
             try
             {
+                await instanceGuard.WaitAsync();
+
+                if (instance != null)
+                    return instance;
+
+                Log.Information("Creating brand new BrowserAutomationGatherer");
+
                 var p = await Playwright.CreateAsync();
                 var b = await p.Firefox.LaunchAsync(new BrowserTypeLaunchOptions
                 {
@@ -63,12 +65,16 @@ namespace BudgetReview.Gathering
 
         public async ValueTask DisposeAsync()
         {
-            Debug.WriteLine("Disposing BrowserAutomationGatherer");
+            Log.Debug("Disposing BrowserAutomationGatherer");
             await instanceGuard.WaitAsync();
+            Log.Verbose("Got instanceGuard");
             await browser.DisposeAsync();
+            Log.Verbose("Disposed browser object");
             playwright.Dispose();
+            Log.Verbose("Disposed playwright object");
             instance = null;
             instanceGuard.Release();
+            Log.Verbose("Released instanceGuard");
         }
     }
 }
