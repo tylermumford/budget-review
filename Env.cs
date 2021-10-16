@@ -49,7 +49,7 @@ namespace BudgetReview
                 .Where(l => l.Length > 0)
                 .Where(l => l[0] != '#');
 
-            var pattern = new Regex(@"([\w_]+)=([^#\n]+)");
+            var pattern = new Regex(@"([\w_]+)='?([^#\n]+)'?");
 
             foreach (var line in linesReady)
             {
