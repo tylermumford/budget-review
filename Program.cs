@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using BudgetReview.Analyzing;
 using BudgetReview.Gathering;
 using BudgetReview.Parsing;
+using Serilog;
+using Serilog.Events;
 
 namespace BudgetReview
 {
@@ -14,24 +16,36 @@ namespace BudgetReview
     {
         static async Task Main(string[] args)
         {
-            ConfigureLogging();
             Env.Load();
+            ConfigureLogging();
 
             Console.WriteLine("# Budget Review");
 
             EmitDebugInfo();
 
+            try
+            {
+                await PerformBudgetReview();
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+        }
+
+        private static async Task PerformBudgetReview()
+        {
             Console.WriteLine("\n## Gathering...");
 
             var gatherer = new RootGatherer();
             var rawProgramData = await gatherer.Start();
 
-            Debug.WriteLine(rawProgramData.ToString());
+            Log.Information("{RawGatheredData}", rawProgramData);
             var sourceCount = rawProgramData.Count();
             var lineCount = rawProgramData.Select(d => d.ContentLines.Length).Sum();
             Console.WriteLine($"Gathered {lineCount} lines of data from {sourceCount} sources");
 
-            Debug.WriteLine("\n## Parsing...");
+            Log.Information("Parsing...");
 
             var parser = new RootParser();
             var parsedData = parser.Parse(rawProgramData);
@@ -44,28 +58,34 @@ namespace BudgetReview
             var analyzer = new RootAnalyzer(parsedData);
             var analysis = analyzer.Analyze();
 
-            Console.WriteLine("Analyzed all data");
+            Log.Information("Analyzed all data");
             Console.WriteLine(analysis.GetDisplayString());
 
-            Debug.WriteLine("\n## Creating output file...");
+            Log.Information("Creating output file...");
 
             analysis.WriteToFile();
 
-            Console.WriteLine("Created output file");
+            Log.Information("Created output file");
         }
 
         private static void EmitDebugInfo()
         {
-            Debug.WriteLine($"Current culture: {CultureInfo.CurrentCulture}");
-            Debug.WriteLine($"Current UI culture: {CultureInfo.CurrentUICulture}");
-            Debug.WriteLine($"Current directory: {Directory.GetCurrentDirectory()}");
-            Debug.WriteLine($"Env file parsed: {Env.Get("env_file_parsed", "No")}");
+            Log.Debug($"Current culture: {CultureInfo.CurrentCulture}");
+            Log.Debug($"Current UI culture: {CultureInfo.CurrentUICulture}");
+            Log.Debug("Current directory: {CurrentDirectory}", Directory.GetCurrentDirectory());
+            Log.Debug("Env file parsed: {IsEnvParsed}", Env.Get("env_file_parsed", "No"));
         }
 
         private static void ConfigureLogging()
         {
             var l = new ConsoleTraceListener();
             Trace.Listeners.Add(l);
+
+            var configuredMin = Env.Get("min_log_level", "Information");
+            var loggerConfig = new LoggerConfiguration()
+                .MinimumLevel.Is(Enum.Parse<LogEventLevel>(configuredMin))
+                .WriteTo.Console();
+            Log.Logger = loggerConfig.CreateLogger();
         }
     }
 }
