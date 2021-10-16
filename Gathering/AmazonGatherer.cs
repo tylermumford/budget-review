@@ -1,24 +1,47 @@
 using System;
-using System.Diagnostics;
+using System.IO;
 using System.Threading.Tasks;
+using Microsoft.Playwright;
+using Serilog;
 
 namespace BudgetReview.Gathering
 {
     internal class AmazonGatherer : IGatherer
     {
+        private int retryCount = 1;
+        private int maxRetryCount = Convert.ToInt32(Env.Get("amazon_max_retries", "2"));
+
         public async Task GatherInto(DataSet<RawDataItem> results)
         {
-            // var g = new FileGatherer(results, Constants.RawDataDir);
-            // // Example: 01-Aug-2021_to_01-Sep-2021.csv
-            // g.AddFile(Source.Amazon, @"\d{2}-\w+-\d{4}_to_\d{2}-\w+-\d{4}\.csv");
             var filename = await DownloadAsync();
-            // var fileLoader
-            return;
+            var fileLoader = new FileGatherer(results, Directory.GetCurrentDirectory());
+            fileLoader.AddFile(Source.Amazon, filename);
+        }
+
+        private async Task<string> DownloadWithRetriesAsync()
+        {
+            while (retryCount <= maxRetryCount)
+            {
+                try
+                {
+                    return await DownloadAsync();
+                }
+                catch (TimeoutException)
+                {
+                    Log.Warning("Amazon: Timeout exception on try {RetryCount} of {MaxRetryCount}", retryCount, maxRetryCount);
+                    retryCount++;
+                    if (retryCount >= maxRetryCount)
+                        throw;
+                }
+            }
+            const string fatalMessage = "Amazon: Broke out of the while loop for retries";
+            Log.Fatal(fatalMessage);
+            throw new InvalidOperationException(fatalMessage);
         }
 
         private async Task<string> DownloadAsync()
         {
-            Debug.WriteLine("Downloading Amazon transactions...");
+            Log.Information("Downloading Amazon transactions...");
 
             var username = Env.GetOrThrow("amazon_username");
             var password = Env.GetOrThrow("amazon_password");
@@ -26,24 +49,34 @@ namespace BudgetReview.Gathering
             var automation = await BrowserAutomationGatherer.GetInstance();
             var page = await automation.CreatePageAsync();
 
-            await page.GotoAsync("https://amazon.com");
+            await page.GotoAsync(Env.GetOrThrow("amazon_sign_in_url"));
 
             // Sign in
-            await page.ClickAsync("#nav-link-accountList");
+            // await page.ClickAsync("#nav-link-accountList");
             await page.FillAsync("#ap_email", username);
             await page.ClickAsync("#continue");
             await page.FillAsync("#ap_password", password);
             await page.ClickAsync("#signInSubmit");
 
             // Fill out order reports form
+            Log.Debug("Amazon: Filling out the report form");
             await page.GotoAsync("https://www.amazon.com/gp/b2b/reports?ref_=ya_d_l_order_reports");
             await page.EvaluateAsync("setDatesToLastMonth()");
-            await page.ClickAsync("#report-confirm");
 
-            // TODO: Figure out how to properly wait for the download
+            // Download the report CSV file
+            Log.Debug("Amazon: Downloading");
+            const int timeout = 45_000;
+            var download = await page.RunAndWaitForDownloadAsync
+            (
+                async () => await page.ClickAsync("#report-confirm"),
+                new PageRunAndWaitForDownloadOptions { Timeout = timeout }
+            );
+            var filename = $"Amazon-{Guid.NewGuid()}.csv";
+            await download.SaveAsAsync(filename);
 
             await page.CloseAsync();
-            return "none";
+            Log.Information("Finished downloading Amazon transactions into {Filename}", filename);
+            return filename;
         }
     }
 }
