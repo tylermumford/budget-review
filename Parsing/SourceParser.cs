@@ -1,9 +1,9 @@
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using CsvHelper;
+using Serilog;
 
 namespace BudgetReview.Parsing
 {
@@ -16,7 +16,7 @@ namespace BudgetReview.Parsing
                 Source = source,
                 LineItems = ExtractLineItems(item.ContentLines),
             };
-            Debug.WriteLine($"Parsed {result.LineItems.Count()} {source} lines, including {result.LineItems.FirstOrDefault()}");
+            Log.Information("Parsed {LineCount} {Source} lines, including {FirstItemParsed}", result.LineItems.Count(), source, result.LineItems.FirstOrDefault());
             return result;
         }
 

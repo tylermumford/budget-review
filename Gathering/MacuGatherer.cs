@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Playwright;
+using Serilog;
 
 namespace BudgetReview.Gathering
 {
@@ -10,12 +10,6 @@ namespace BudgetReview.Gathering
     {
         public async Task GatherInto(DataSet<RawDataItem> results)
         {
-            if (Env.Get("skip_macu").ToLower() == "true")
-            {
-                Console.WriteLine("Configured to skip MacuGatherer");
-                return;
-            }
-
             var filename = await DownloadAsync();
             var fileLoader = new FileGatherer(results, Directory.GetCurrentDirectory());
             fileLoader.AddFile(Source.MACU, filename);
@@ -26,7 +20,7 @@ namespace BudgetReview.Gathering
         private async Task<string> DownloadAsync()
         {
 
-            Debug.WriteLine("Downloading MACU transactions...");
+            Log.Information("Downloading MACU transactions...");
             var username = Env.GetOrThrow("macu_username");
             var password = Env.GetOrThrow("macu_password");
             var account = Env.GetOrThrow("macu_account_id");
@@ -47,6 +41,7 @@ namespace BudgetReview.Gathering
             });
 
             // Open the "Download Transactions" slider for the main account
+            Log.Debug("MACU: Opening the export form");
             await page.ClickAsync($"[href*=account-{account}]");
             await page.ClickAsync("#export_trigger");
             var format = await page.WaitForSelectorAsync("#export-format-dropdown");
@@ -54,6 +49,7 @@ namespace BudgetReview.Gathering
                 throw new Exception("Couldn't get the format dropdown");
 
             // Fill out the form
+            Log.Debug("MACU: Filling out the export form");
             await format.ClickAsync();
             await page.ClickAsync(".iris-list-item[data-value=\"54\"]");
 
@@ -61,6 +57,7 @@ namespace BudgetReview.Gathering
             await page.FillAsync("#Parameters_EndDate", "2021-10-13");
 
             // Get the exported CSV file
+            Log.Debug("MACU: Downloading");
             var download = await page.RunAndWaitForDownloadAsync(async () =>
                 await page.ClickAsync("#export_transactions_confirm_button")
             );
@@ -68,7 +65,7 @@ namespace BudgetReview.Gathering
             await download.SaveAsAsync(filename);
 
             await page.CloseAsync();
-            Debug.WriteLine("Finished downloading MACU transactions");
+            Log.Information("Finished downloading MACU transactions");
             return filename;
         }
     }

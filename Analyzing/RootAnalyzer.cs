@@ -1,6 +1,6 @@
-using System;
 using System.Diagnostics;
 using System.Linq;
+using Serilog;
 
 namespace BudgetReview.Analyzing
 {
@@ -24,7 +24,7 @@ namespace BudgetReview.Analyzing
             BasicAnalyzer.Step(Result);
 
             s.Stop();
-            Debug.WriteLine($"Analysis finished in {s.Elapsed}");
+            Log.Information("Analysis finished in {Elapsed}", s.Elapsed);
             return Result;
         }
 

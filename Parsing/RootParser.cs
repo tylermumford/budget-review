@@ -1,6 +1,4 @@
 using System;
-using System.Diagnostics;
-using System.Linq;
 
 namespace BudgetReview.Parsing
 {
@@ -43,10 +41,6 @@ namespace BudgetReview.Parsing
                         line.Amount = -line.Amount;
                     break;
             }
-
-            //Debug.WriteLine("------------");
-            //Debug.WriteLine(string.Join('\n', itemResult.LineItems));
-            //Debug.WriteLine("------------");
 
             result.Add(itemResult);
         }

@@ -1,8 +1,8 @@
 using System.IO;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Serilog;
 
 namespace BudgetReview.Gathering
 {
@@ -48,13 +48,13 @@ namespace BudgetReview.Gathering
 
             if (matches.Count() == 1)
             {
-                Debug.WriteLine($"{source}: One match: {matches.First()}");
+                Log.Debug($"{source}: One match: {matches.First()}");
                 return new FileInfo(matches.First());
             }
 
             if (!matches.Any())
             {
-                Debug.WriteLine($"{source}: No matches");
+                Log.Warning($"{source}: No matches");
                 return null;
             }
 
@@ -63,7 +63,7 @@ namespace BudgetReview.Gathering
                 .OrderByDescending(f => File.GetCreationTimeUtc(f))
                 .Select(f => new FileInfo(f))
                 .First();
-            Debug.WriteLine($"{source}: {matches.Count()} matches, most recent: {chosenOne.Name}");
+            Log.Debug($"{source}: {matches.Count()} matches, most recent: {chosenOne.Name}");
             return chosenOne;
         }
     }
