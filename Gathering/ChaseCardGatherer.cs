@@ -1,12 +1,15 @@
+using System.Threading.Tasks;
+
 namespace BudgetReview.Gathering
 {
-    internal static class ChaseCardGatherer
+    internal class ChaseCardGatherer : IGatherer
     {
-        public static void AddChaseCardTransactions(DataSet<RawDataItem> results)
+        public Task GatherInto(DataSet<RawDataItem> results)
         {
             var g = new FileGatherer(results, Constants.RawDataDir);
             // Example: Chase7878_Activity20210801_20210831_20210922.CSV
             g.AddFile(Source.ChaseCard, @"Chase7878_.+\.CSV");
+            return Task.CompletedTask;
         }
     }
 }
