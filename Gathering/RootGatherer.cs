@@ -7,6 +7,7 @@ using static BudgetReview.Gathering.AmazonGatherer;
 using static BudgetReview.Gathering.CitiCardGatherer;
 using static BudgetReview.Gathering.ChaseCardGatherer;
 using System.Collections.Generic;
+using Serilog;
 
 namespace BudgetReview.Gathering
 {
@@ -22,8 +23,10 @@ namespace BudgetReview.Gathering
 
         private void InstantiateGatherers()
         {
-            gatherers.Add(new MacuGatherer());
+            Log.Verbose("Instantiating gatherers");
+            // gatherers.Add(new MacuGatherer());
             gatherers.Add(new AmazonGatherer());
+            gatherers.Add(new CitiCardGatherer());
         }
 
         private async Task<DataSet<RawDataItem>> GatherAll()
@@ -40,10 +43,10 @@ namespace BudgetReview.Gathering
             }
             Task.WaitAll(tasks.ToArray());
 
-            AddCitiCardTransactions(result);
             AddChaseCardTransactions(result);
 
-            await (await BrowserAutomationGatherer.GetInstance()).DisposeAsync();
+            if (BrowserAutomationGatherer.HasInstance)
+                await (await BrowserAutomationGatherer.GetInstance()).DisposeAsync();
             return result;
         }
     }
