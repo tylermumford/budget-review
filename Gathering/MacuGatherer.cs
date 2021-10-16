@@ -19,8 +19,8 @@ namespace BudgetReview.Gathering
         ///<returns>Filename of downloaded CSV file</returns>
         private async Task<string> DownloadAsync()
         {
-
             Log.Information("Downloading MACU transactions...");
+            var url = Env.GetOrThrow("macu_sign_in_url");
             var username = Env.GetOrThrow("macu_username");
             var password = Env.GetOrThrow("macu_password");
             var account = Env.GetOrThrow("macu_account_id");
@@ -29,12 +29,12 @@ namespace BudgetReview.Gathering
             var page = await automation.CreatePageAsync();
 
             // Log in
-            await page.GotoAsync("https://www.macu.com/");
-            await page.ClickAsync("[name=username]");
-            await page.FillAsync("[name=username]", username);
-            await page.FillAsync("[name=password]", password);
+            await page.GotoAsync(url);
+            // await page.ClickAsync("[name=username]");
+            await page.FillAsync("#username", username);
+            await page.FillAsync("#password", password);
             await page.RunAndWaitForNavigationAsync(async () =>
-                await page.ClickAsync("button[id*=login]")
+                await page.ClickAsync("button[type=submit]")
             , new PageRunAndWaitForNavigationOptions
             {
                 UrlString = "https://o.macu.com/DashboardV2",
