@@ -3,6 +3,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Playwright;
 using Serilog;
+using static BudgetReview.Gathering.Dates.DateRange;
 
 namespace BudgetReview.Gathering
 {
@@ -46,7 +47,7 @@ namespace BudgetReview.Gathering
             var username = Env.GetOrThrow("amazon_username");
             var password = Env.GetOrThrow("amazon_password");
 
-            var automation = await BrowserAutomationGatherer.GetInstance();
+            var automation = await BrowserAutomationGatherer.LazyInstance;
             var page = await automation.CreatePageAsync();
 
             await page.GotoAsync(Env.GetOrThrow("amazon_sign_in_url"));
@@ -56,12 +57,21 @@ namespace BudgetReview.Gathering
             await page.FillAsync("#ap_email", username);
             await page.ClickAsync("#continue");
             await page.FillAsync("#ap_password", password);
-            await page.ClickAsync("#signInSubmit");
+            await page.RunAndWaitForNavigationAsync(async () =>
+                await page.ClickAsync("#signInSubmit")
+            );
 
             // Fill out order reports form
             Log.Debug("Amazon: Filling out the report form");
             await page.GotoAsync("https://www.amazon.com/gp/b2b/reports?ref_=ya_d_l_order_reports");
-            await page.EvaluateAsync("setDatesToLastMonth()");
+            await Task.WhenAll(
+                page.SelectOptionAsync("#report-month-start", FirstDay.Month.ToString()),
+                page.SelectOptionAsync("#report-day-start", FirstDay.Day.ToString()),
+                page.SelectOptionAsync("#report-year-start", FirstDay.Year.ToString()),
+                page.SelectOptionAsync("#report-month-end", LastDay.Month.ToString()),
+                page.SelectOptionAsync("#report-day-end", LastDay.Day.ToString()),
+                page.SelectOptionAsync("#report-year-end", LastDay.Year.ToString())
+            );
 
             // Download the report CSV file
             Log.Debug("Amazon: Downloading");

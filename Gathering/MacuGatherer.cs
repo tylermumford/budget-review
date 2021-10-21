@@ -3,6 +3,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Playwright;
 using Serilog;
+using BudgetReview.Gathering.Dates;
 
 namespace BudgetReview.Gathering
 {
@@ -25,7 +26,7 @@ namespace BudgetReview.Gathering
             var password = Env.GetOrThrow("macu_password");
             var account = Env.GetOrThrow("macu_account_id");
 
-            var automation = await BrowserAutomationGatherer.GetInstance();
+            var automation = await BrowserAutomationGatherer.LazyInstance;
             var page = await automation.CreatePageAsync();
 
             // Log in
@@ -38,6 +39,7 @@ namespace BudgetReview.Gathering
             , new PageRunAndWaitForNavigationOptions
             {
                 UrlString = "https://o.macu.com/DashboardV2",
+                WaitUntil = WaitUntilState.NetworkIdle,
             });
 
             // Open the "Download Transactions" slider for the main account
@@ -53,8 +55,8 @@ namespace BudgetReview.Gathering
             await format.ClickAsync();
             await page.ClickAsync(".iris-list-item[data-value=\"54\"]");
 
-            await page.FillAsync("#Parameters_StartDate", "2021-10-01");
-            await page.FillAsync("#Parameters_EndDate", "2021-10-13");
+            await page.FillAsync("#Parameters_StartDate", DateRange.FirstDay.ToIso());
+            await page.FillAsync("#Parameters_EndDate", DateRange.LastDay.ToIso());
 
             // Get the exported CSV file
             Log.Debug("MACU: Downloading");
@@ -65,7 +67,7 @@ namespace BudgetReview.Gathering
             await download.SaveAsAsync(filename);
 
             await page.CloseAsync();
-            Log.Information("Finished downloading MACU transactions");
+            Log.Information("MACU: Finished downloading");
             return filename;
         }
     }
