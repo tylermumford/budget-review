@@ -1,6 +1,9 @@
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Serilog;
+using BudgetReview.Gathering.Dates;
+using static BudgetReview.Gathering.Dates.DateRange;
+using System;
 
 namespace BudgetReview.Gathering
 {
@@ -10,6 +13,7 @@ namespace BudgetReview.Gathering
 
         public Task<DataSet<RawDataItem>> Start()
         {
+            Console.WriteLine($"Gathering transactions between {FirstDay.ToIso()} and {LastDay.ToIso()}");
             InstantiateGatherers();
             return GatherAll();
         }
@@ -28,17 +32,28 @@ namespace BudgetReview.Gathering
             var result = new DataSet<RawDataItem>();
 
             var tasks = new List<Task>();
+            var max = Convert.ToInt32(Env.Get("max_simultaneous_gatherers", "2"));
             foreach (var g in gatherers)
             {
                 // Note: This is not thread-safe, because DataSet doesn't synchronize its
                 // underlying List. Add synchronization or have GatherInto return results
                 // that get merged on one thread.
-                tasks.Add(g.GatherInto(result));
+
+                if (tasks.Count < max)
+                {
+                    tasks.Add(g.GatherInto(result));
+                }
+                else
+                {
+                    await Task.WhenAny(tasks);
+                    tasks.RemoveAll(t => t.IsCompleted);
+                    tasks.Add(g.GatherInto(result));
+                }
             }
-            Task.WaitAll(tasks.ToArray());
+            await Task.WhenAll(tasks);
 
             if (BrowserAutomationGatherer.HasInstance)
-                await (await BrowserAutomationGatherer.GetInstance()).DisposeAsync();
+                await (await BrowserAutomationGatherer.LazyInstance).DisposeAsync();
             return result;
         }
     }
