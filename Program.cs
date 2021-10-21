@@ -74,6 +74,7 @@ namespace BudgetReview
             Log.Debug($"Current UI culture: {CultureInfo.CurrentUICulture}");
             Log.Debug("Current directory: {CurrentDirectory}", Directory.GetCurrentDirectory());
             Log.Debug("Env file parsed: {IsEnvParsed}", Env.Get("env_file_parsed", "No"));
+            Log.Debug("Command line args: {Args}", Environment.GetCommandLineArgs());
         }
 
         private static void ConfigureLogging()
