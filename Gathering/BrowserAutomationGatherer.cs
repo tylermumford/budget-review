@@ -8,9 +8,6 @@ namespace BudgetReview.Gathering
 {
     internal class BrowserAutomationGatherer : IAsyncDisposable
     {
-        private static BrowserAutomationGatherer? instance;
-        private static SemaphoreSlim instanceGuard = new(1, 1);
-
         private IPlaywright playwright;
 
         private IBrowser browser;
@@ -21,37 +18,23 @@ namespace BudgetReview.Gathering
             browser = b;
         }
 
-        public static bool HasInstance { get => instance != null; }
+        public static bool HasInstance { get => LazyInstance.IsValueCreated; }
 
-        public static async Task<BrowserAutomationGatherer> GetInstance()
+        public static async Task<BrowserAutomationGatherer> GetInstanceUnlocked()
         {
-            if (instance != null)
-                return instance;
+            Log.Information("Creating new BrowserAutomationGatherer");
 
-            try
+            var p = await Playwright.CreateAsync();
+            var b = await p.Firefox.LaunchAsync(new BrowserTypeLaunchOptions
             {
-                await instanceGuard.WaitAsync();
+                Headless = Convert.ToBoolean(Env.Get("headless", "true")),
+                SlowMo = Convert.ToInt32(Env.Get("slow_mo_delay", "0")),
+            });
 
-                if (instance != null)
-                    return instance;
-
-                Log.Information("Creating brand new BrowserAutomationGatherer");
-
-                var p = await Playwright.CreateAsync();
-                var b = await p.Firefox.LaunchAsync(new BrowserTypeLaunchOptions
-                {
-                    Headless = Convert.ToBoolean(Env.Get("headless", "true")),
-                    SlowMo = Convert.ToInt32(Env.Get("slow_mo_delay", "0")),
-                });
-
-                instance = new BrowserAutomationGatherer(p, b);
-                return instance;
-            }
-            finally
-            {
-                instanceGuard.Release();
-            }
+            return new BrowserAutomationGatherer(p, b);
         }
+
+        public static AsyncLazy<BrowserAutomationGatherer> LazyInstance = new (GetInstanceUnlocked);
 
         public async Task<IPage> CreatePageAsync()
         {
@@ -66,15 +49,10 @@ namespace BudgetReview.Gathering
         public async ValueTask DisposeAsync()
         {
             Log.Debug("Disposing BrowserAutomationGatherer");
-            await instanceGuard.WaitAsync();
-            Log.Verbose("Got instanceGuard");
             await browser.DisposeAsync();
             Log.Verbose("Disposed browser object");
             playwright.Dispose();
             Log.Verbose("Disposed playwright object");
-            instance = null;
-            instanceGuard.Release();
-            Log.Verbose("Released instanceGuard");
         }
     }
 }
