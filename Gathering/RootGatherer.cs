@@ -21,10 +21,11 @@ namespace BudgetReview.Gathering
         private void InstantiateGatherers()
         {
             Log.Verbose("Instantiating gatherers");
-            gatherers.Add(new MacuGatherer());
             gatherers.Add(new AmazonGatherer());
+            gatherers.Add(new MacuGatherer());
             gatherers.Add(new CitiCardGatherer());
             gatherers.Add(new ChaseCardGatherer());
+            gatherers.Add(new ChaseAmazonGatherer());
         }
 
         private async Task<DataSet<RawDataItem>> GatherAll()

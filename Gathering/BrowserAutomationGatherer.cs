@@ -42,6 +42,11 @@ namespace BudgetReview.Gathering
             {
                 AcceptDownloads = true,
             });
+            var timeout = Convert.ToInt32(Env.Get("default_timeout_ms", "30000"));
+            Log.Debug("Default timeout: {Timeout}", timeout);
+            c.SetDefaultTimeout(timeout);
+            c.SetDefaultNavigationTimeout(timeout);
+
             var p = await c.NewPageAsync();
             return p;
         }

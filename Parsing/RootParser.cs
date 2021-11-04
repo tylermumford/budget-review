@@ -32,9 +32,12 @@ namespace BudgetReview.Parsing
                     goto invert;
                 case Source.ChaseCard:
                     itemResult = SourceParser<ChaseCardLineItem>.Parse(item, Source.ChaseCard);
-                    goto invert;
+                    break;
+                case Source.AmazonVisa:
+                    itemResult = SourceParser<ChaseCardLineItem>.Parse(item, Source.AmazonVisa);
+                    break;
                 default:
-                    throw new NotImplementedException();
+                    throw new NotImplementedException($"Cannot parse source {item.Source}");
 
                 invert:
                     foreach (var line in itemResult.LineItems)
