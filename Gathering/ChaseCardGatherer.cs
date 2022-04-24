@@ -6,7 +6,7 @@ namespace BudgetReview.Gathering
     {
         public Task GatherInto(DataSet<RawDataItem> results)
         {
-            var g = new FileLoader(results, Constants.RawDataDir);
+            var g = new FileLoader(results, Env.GetOrThrow("DOWNLOADS_DIRECTORY"));
             // Example: Chase7878_Activity20210801_20210831_20210922.CSV
             g.AddFile(Source.ChaseCard, @"Chase7878_.+\.CSV");
             return Task.CompletedTask;

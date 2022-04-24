@@ -48,9 +48,9 @@ namespace BudgetReview.Analyzing
                     line.Description.StartsWith("From Share ")
                     || line.Description.StartsWith("To Share ")
                 )
-                && Constants.ShouldIgnoreMacuTransfers;
+                && Env.GetOrThrow("SHOULD_IGNORE_MACU_TRANSFERS") == "1";
 
-            var ignoreAsCardPayment = Constants.ShouldIgnoreCardPayments
+            var ignoreAsCardPayment = Env.GetOrThrow("SHOULD_IGNORE_CARD_PAYMENTS") == "1"
                 && (
                     line.Description.StartsWith("Payment to Chase Mastercard & Visa")
                     || line.Description.StartsWith("Payment to Citibank")
