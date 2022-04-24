@@ -6,12 +6,12 @@ using Serilog;
 
 namespace BudgetReview.Gathering
 {
-    internal class FileGatherer
+    internal class FileLoader
     {
         private readonly DataSet<RawDataItem> Results;
         private readonly string SearchDir;
 
-        public FileGatherer(DataSet<RawDataItem> results, string searchDir)
+        public FileLoader(DataSet<RawDataItem> results, string searchDir)
         {
             Results = results;
             SearchDir = searchDir;

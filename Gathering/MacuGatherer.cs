@@ -12,7 +12,7 @@ namespace BudgetReview.Gathering
         public async Task GatherInto(DataSet<RawDataItem> results)
         {
             var filename = await DownloadAsync();
-            var fileLoader = new FileGatherer(results, Directory.GetCurrentDirectory());
+            var fileLoader = new FileLoader(results, Directory.GetCurrentDirectory());
             fileLoader.AddFile(Source.MACU, filename);
         }
 
@@ -26,7 +26,7 @@ namespace BudgetReview.Gathering
             var password = Env.GetOrThrow("macu_password");
             var account = Env.GetOrThrow("macu_account_id");
 
-            var automation = await BrowserAutomationGatherer.LazyInstance;
+            var automation = await BrowserAutomationPool.LazyInstance;
             var page = await automation.CreatePageAsync();
 
             // Log in

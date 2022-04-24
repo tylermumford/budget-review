@@ -12,7 +12,7 @@ namespace BudgetReview.Gathering
         public async Task GatherInto(DataSet<RawDataItem> results)
         {
             var filename = await DownloadAsync();
-            var fileLoder = new FileGatherer(results, Directory.GetCurrentDirectory());
+            var fileLoder = new FileLoader(results, Directory.GetCurrentDirectory());
             fileLoder.AddFile(Source.CitiCard, filename);
         }
 
@@ -23,7 +23,7 @@ namespace BudgetReview.Gathering
             var username = Env.GetOrThrow("citi_username");
             var password = Env.GetOrThrow("citi_password");
 
-            var automation = await BrowserAutomationGatherer.LazyInstance;
+            var automation = await BrowserAutomationPool.LazyInstance;
             var page = await automation.CreatePageAsync();
 
             // Log in

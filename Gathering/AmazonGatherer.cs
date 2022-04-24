@@ -15,7 +15,7 @@ namespace BudgetReview.Gathering
         public async Task GatherInto(DataSet<RawDataItem> results)
         {
             var filename = await DownloadAsync();
-            var fileLoader = new FileGatherer(results, Directory.GetCurrentDirectory());
+            var fileLoader = new FileLoader(results, Directory.GetCurrentDirectory());
             fileLoader.AddFile(Source.Amazon, filename);
         }
 
@@ -47,7 +47,7 @@ namespace BudgetReview.Gathering
             var username = Env.GetOrThrow("amazon_username");
             var password = Env.GetOrThrow("amazon_password");
 
-            var automation = await BrowserAutomationGatherer.LazyInstance;
+            var automation = await BrowserAutomationPool.LazyInstance;
             var page = await automation.CreatePageAsync();
 
             await page.GotoAsync(Env.GetOrThrow("amazon_sign_in_url"));

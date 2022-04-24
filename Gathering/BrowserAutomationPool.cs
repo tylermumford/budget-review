@@ -6,13 +6,14 @@ using Serilog;
 
 namespace BudgetReview.Gathering
 {
-    internal class BrowserAutomationGatherer : IAsyncDisposable
+    ///<summary>Manages a pool of browser automation objects.</summary>
+    internal class BrowserAutomationPool : IAsyncDisposable
     {
         private IPlaywright playwright;
 
         private IBrowser browser;
 
-        private BrowserAutomationGatherer(IPlaywright p, IBrowser b)
+        private BrowserAutomationPool(IPlaywright p, IBrowser b)
         {
             playwright = p;
             browser = b;
@@ -20,9 +21,9 @@ namespace BudgetReview.Gathering
 
         public static bool HasInstance { get => LazyInstance.IsValueCreated; }
 
-        public static async Task<BrowserAutomationGatherer> GetInstanceUnlocked()
+        public static async Task<BrowserAutomationPool> GetInstanceUnlocked()
         {
-            Log.Information("Creating new BrowserAutomationGatherer");
+            Log.Information("Creating new BrowserAutomationPool");
 
             var p = await Playwright.CreateAsync();
             var b = await p.Firefox.LaunchAsync(new BrowserTypeLaunchOptions
@@ -31,10 +32,10 @@ namespace BudgetReview.Gathering
                 SlowMo = Convert.ToInt32(Env.Get("slow_mo_delay", "0")),
             });
 
-            return new BrowserAutomationGatherer(p, b);
+            return new BrowserAutomationPool(p, b);
         }
 
-        public static AsyncLazy<BrowserAutomationGatherer> LazyInstance = new (GetInstanceUnlocked);
+        public static AsyncLazy<BrowserAutomationPool> LazyInstance = new (GetInstanceUnlocked);
 
         public async Task<IPage> CreatePageAsync()
         {
@@ -53,7 +54,7 @@ namespace BudgetReview.Gathering
 
         public async ValueTask DisposeAsync()
         {
-            Log.Debug("Disposing BrowserAutomationGatherer");
+            Log.Debug("Disposing BrowserAutomationPool");
             await browser.DisposeAsync();
             Log.Verbose("Disposed browser object");
             playwright.Dispose();

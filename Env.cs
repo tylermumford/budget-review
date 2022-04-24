@@ -6,6 +6,10 @@ using System.Text.RegularExpressions;
 
 namespace BudgetReview
 {
+    ///<summary>
+    /// Loads settings from a .env file and makes them available to the rest
+    /// of the program.
+    ///</summary>
     internal static class Env
     {
         private static Dictionary<string, string> Values = new();

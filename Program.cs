@@ -37,7 +37,7 @@ namespace BudgetReview
         {
             Console.WriteLine("\n## Gathering...");
 
-            var gatherer = new RootGatherer();
+            var gatherer = new GatheringRoot();
             var rawProgramData = await gatherer.Start();
 
             Log.Information("{RawGatheredData}", rawProgramData);

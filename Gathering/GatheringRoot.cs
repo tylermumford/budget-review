@@ -7,7 +7,8 @@ using System;
 
 namespace BudgetReview.Gathering
 {
-    internal class RootGatherer
+    ///<summary>Starts all the code that gathers records of money spent.</summary>
+    internal class GatheringRoot
     {
         private List<IGatherer> gatherers = new();
 
@@ -53,8 +54,8 @@ namespace BudgetReview.Gathering
             }
             await Task.WhenAll(tasks);
 
-            if (BrowserAutomationGatherer.HasInstance)
-                await (await BrowserAutomationGatherer.LazyInstance).DisposeAsync();
+            if (BrowserAutomationPool.HasInstance)
+                await (await BrowserAutomationPool.LazyInstance).DisposeAsync();
             return result;
         }
     }

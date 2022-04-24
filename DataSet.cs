@@ -4,6 +4,7 @@ using System.Text;
 
 namespace BudgetReview
 {
+    ///<summary>Holds a generic, add- and get-only collection of items.</summary>
     internal class DataSet<T> : IEnumerable<T>
     {
         private readonly List<T> items = new();
