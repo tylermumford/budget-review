@@ -1,5 +1,7 @@
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using BudgetReview.Extensions;
 using Serilog;
 
 namespace BudgetReview.Analyzing
@@ -20,7 +22,7 @@ namespace BudgetReview.Analyzing
             s.Start();
 
             NormalizationAndFilteringStep();
-            IncomeStep();
+            PaycheckIdentificationStep();
             BasicAnalyzer.Step(Result);
 
             s.Stop();
@@ -60,15 +62,24 @@ namespace BudgetReview.Analyzing
             return ignoreAsMacuTransfer || ignoreAsCardPayment;
         }
 
-        private void IncomeStep()
+        private void PaycheckIdentificationStep()
         {
             var macu = Result.Transactions.Where(t => t.Source == Source.MACU);
             var incomeTransactions = macu.Where(t => t.Amount > 0);
             foreach (var t in incomeTransactions)
                 t.Category = Category.ByName("Income");
 
-            foreach (var t in incomeTransactions.Where(t => t.Description == "Mana Deposit"))
-                t.Description = "ManagerPlus paycheck";
+            var substrings = SubstringsThatIdentifyIncome();
+            foreach (var t in incomeTransactions.Where(t => t.Description.ContainsAny(substrings)))
+                t.Description = "Paycheck";
+        }
+
+        private IEnumerable<string> SubstringsThatIdentifyIncome()
+        {
+            var envPreference = Env.Get("PAYCHECK_IDENTIFICATION_SUBSTRINGS");
+            var splitter = Env.Get("PAYCHECK_IDENTIFICATION_SPLIT_CHAR", "|");
+            var substrings = envPreference.Split(splitter);
+            return substrings;
         }
     }
 }

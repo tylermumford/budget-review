@@ -3,6 +3,10 @@ using System.Collections.Generic;
 
 namespace BudgetReview.Analyzing
 {
+    ///<summary>
+    /// Represensts a transaction category. Created by string inputs, but managed
+    /// so that identical strings always produce the same Category instance.
+    ///</summary>
     internal class Category
     {
         public string Name { get; private set; }
