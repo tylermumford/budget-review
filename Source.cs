@@ -9,6 +9,6 @@ namespace BudgetReview
         ChaseCard,
         AmazonVisa,
 
-        // TODO: Venmo? PayPal?
+        WellsFargo,
     }
 }
