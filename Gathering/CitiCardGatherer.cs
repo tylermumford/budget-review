@@ -31,10 +31,13 @@ namespace BudgetReview.Gathering
             await page.FillAsync("#username", username);
             await page.FillAsync("#password", password);
             await page.RunAndWaitForNavigationAsync(async () =>
-                await page.ClickAsync("#signInBtn")
+            {
+                await page.ClickAsync("#signInBtn");
+                Log.Debug("Clicked sign in button");
+            }
             , new PageRunAndWaitForNavigationOptions
             {
-                UrlString = "https://online.citi.com/US/ag/accountdetails",
+                UrlString = "https://online.citi.com/US/ag/mrc/dashboard",
             });
 
             // Fill out the form
