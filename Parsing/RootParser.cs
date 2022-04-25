@@ -36,6 +36,9 @@ namespace BudgetReview.Parsing
                 case Source.AmazonVisa:
                     itemResult = SourceParser<ChaseCardLineItem>.Parse(item, Source.AmazonVisa);
                     break;
+                case Source.WellsFargo:
+                    itemResult = SourceParser<WellsFargoLineItem>.Parse(item, Source.WellsFargo);
+                    break;
                 default:
                     throw new NotImplementedException($"Cannot parse source {item.Source}");
 
