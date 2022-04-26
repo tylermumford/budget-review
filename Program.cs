@@ -25,7 +25,12 @@ namespace BudgetReview
 
             try
             {
+                var clock = new Stopwatch();
+                clock.Start();
+
                 await PerformBudgetReview();
+
+                Log.Debug("Budget review took {Duration} to run", clock.Elapsed);
             }
             finally
             {
