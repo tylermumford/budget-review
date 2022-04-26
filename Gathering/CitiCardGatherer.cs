@@ -28,6 +28,8 @@ namespace BudgetReview.Gathering
 
             // Log in
             await page.GotoAsync(url);
+            Log.Debug("Waiting for NetworkIdle...");
+            await page.WaitForLoadStateAsync(LoadState.NetworkIdle);
             await page.FillAsync("#username", username);
             await page.FillAsync("#password", password);
             await page.RunAndWaitForNavigationAsync(async () =>
