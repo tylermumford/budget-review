@@ -8,13 +8,13 @@ using System.Diagnostics;
 namespace BudgetReview.Gathering
 {
     ///<summary>Manages a pool of browser automation objects.</summary>
-    internal class BrowserAutomationPool : IAsyncDisposable
+    internal class BrowserAutomationSingleton : IAsyncDisposable
     {
         private IPlaywright playwright;
 
         private IBrowser browser;
 
-        private BrowserAutomationPool(IPlaywright p, IBrowser b)
+        private BrowserAutomationSingleton(IPlaywright p, IBrowser b)
         {
             playwright = p;
             browser = b;
@@ -22,7 +22,7 @@ namespace BudgetReview.Gathering
 
         public static bool HasInstance { get => LazyInstance.IsValueCreated; }
 
-        public static async Task<BrowserAutomationPool> GetInstanceUnlocked()
+        public static async Task<BrowserAutomationSingleton> GetInstanceUnlocked()
         {
             Log.Information("Creating new BrowserAutomationPool");
 
@@ -33,10 +33,10 @@ namespace BudgetReview.Gathering
                 SlowMo = Convert.ToInt32(Env.Get("slow_mo_delay", "0")),
             });
 
-            return new BrowserAutomationPool(p, b);
+            return new BrowserAutomationSingleton(p, b);
         }
 
-        public static AsyncLazy<BrowserAutomationPool> LazyInstance = new (GetInstanceUnlocked);
+        public static AsyncLazy<BrowserAutomationSingleton> LazyInstance = new (GetInstanceUnlocked);
 
         public async Task<IPage> CreatePageAsync()
         {

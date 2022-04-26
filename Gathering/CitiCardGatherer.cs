@@ -23,7 +23,7 @@ namespace BudgetReview.Gathering
             var username = Env.GetOrThrow("citi_username");
             var password = Env.GetOrThrow("citi_password");
 
-            var automation = await BrowserAutomationPool.LazyInstance;
+            var automation = await BrowserAutomationSingleton.LazyInstance;
             var page = await automation.CreatePageAsync();
 
             // Log in

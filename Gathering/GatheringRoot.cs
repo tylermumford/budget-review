@@ -55,8 +55,8 @@ namespace BudgetReview.Gathering
             }
             await Task.WhenAll(tasks);
 
-            if (BrowserAutomationPool.HasInstance)
-                await (await BrowserAutomationPool.LazyInstance).DisposeAsync();
+            if (BrowserAutomationSingleton.HasInstance)
+                await (await BrowserAutomationSingleton.LazyInstance).DisposeAsync();
             return result;
         }
     }
