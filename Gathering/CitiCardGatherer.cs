@@ -34,11 +34,34 @@ namespace BudgetReview.Gathering
             {
                 await page.ClickAsync("#signInBtn");
                 Log.Debug("Clicked sign in button");
+
+                // Deal with possible promotional page
+                if (await page.IsVisibleAsync("text=Earn a $100-$300 Cash Bonus"))
+                {
+                    Log.Information("Dealing with promotional page.");
+                    await page.ClickAsync("text=No Thanks");
+                }
+                else
+                {
+                    Log.Debug("No promotional page detected.");
+                }
             }
             , new PageRunAndWaitForNavigationOptions
             {
                 UrlString = "https://online.citi.com/US/ag/mrc/dashboard",
             });
+
+            // Deal with possibility of multiple accounts
+            var activeCardSelector = "text=Card-8979";
+            if (await page.IsVisibleAsync(activeCardSelector))
+            {
+                Log.Information("Clicking into active card account.");
+                await page.ClickAsync(activeCardSelector);
+            }
+            else
+            {
+                Log.Debug("No need to click into active card account.");
+            }
 
             // Fill out the form
             Log.Debug("Citi: Filling out form");
