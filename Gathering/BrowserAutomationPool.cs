@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using System.Threading;
 using Microsoft.Playwright;
 using Serilog;
+using System.Diagnostics;
 
 namespace BudgetReview.Gathering
 {
@@ -39,6 +40,9 @@ namespace BudgetReview.Gathering
 
         public async Task<IPage> CreatePageAsync()
         {
+            var clock = new Stopwatch();
+            clock.Start();
+
             var c = await browser.NewContextAsync(new BrowserNewContextOptions
             {
                 AcceptDownloads = true,
@@ -49,6 +53,8 @@ namespace BudgetReview.Gathering
             c.SetDefaultNavigationTimeout(timeout);
 
             var p = await c.NewPageAsync();
+
+            Log.Information("CreatePageAsync took {Duration}ms", clock.ElapsedMilliseconds);
             return p;
         }
 
