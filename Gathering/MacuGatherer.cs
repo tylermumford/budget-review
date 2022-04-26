@@ -26,7 +26,7 @@ namespace BudgetReview.Gathering
             var password = Env.GetOrThrow("macu_password");
             var account = Env.GetOrThrow("macu_account_id");
 
-            var automation = await BrowserAutomationSingleton.LazyInstance;
+            var automation = await BrowserAutomationSingleton.SharedInstance;
             var page = await automation.CreatePageAsync();
 
             // Log in

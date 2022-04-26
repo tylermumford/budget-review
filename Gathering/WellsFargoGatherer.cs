@@ -25,7 +25,7 @@ namespace BudgetReview.Gathering
             var username = Env.GetOrThrow("wells_fargo_username");
             var password = Env.GetOrThrow("wells_fargo_password");
 
-            var automation = await BrowserAutomationSingleton.LazyInstance;
+            var automation = await BrowserAutomationSingleton.SharedInstance;
             var page = await automation.CreatePageAsync();
 
             // Log in
