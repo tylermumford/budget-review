@@ -9,9 +9,6 @@ namespace BudgetReview.Gathering
 {
     internal class AmazonGatherer : IGatherer
     {
-        private int retryCount = 1;
-        private int maxRetryCount = Convert.ToInt32(Env.Get("amazon_max_retries", "2"));
-
         public async Task GatherInto(DataSet<RawDataItem> results)
         {
             var filename = await DownloadAsync();
@@ -19,26 +16,8 @@ namespace BudgetReview.Gathering
             fileLoader.AddFile(Source.Amazon, filename);
         }
 
-        private async Task<string> DownloadWithRetriesAsync()
-        {
-            while (retryCount <= maxRetryCount)
-            {
-                try
-                {
-                    return await DownloadAsync();
-                }
-                catch (TimeoutException)
-                {
-                    Log.Warning("Amazon: Timeout exception on try {RetryCount} of {MaxRetryCount}", retryCount, maxRetryCount);
-                    retryCount++;
-                    if (retryCount >= maxRetryCount)
-                        throw;
-                }
-            }
-            const string fatalMessage = "Amazon: Broke out of the while loop for retries";
-            Log.Fatal(fatalMessage);
-            throw new InvalidOperationException(fatalMessage);
-        }
+        // There used to be a method here for retrying after failure, but it
+        // wasn't being used, so it wasn't needed.
 
         private async Task<string> DownloadAsync()
         {
