@@ -84,13 +84,11 @@ namespace BudgetReview
 
         private static void ConfigureLogging()
         {
-            var l = new ConsoleTraceListener();
-            Trace.Listeners.Add(l);
-
             var configuredMin = Env.Get("min_log_level", "Warning");
             var loggerConfig = new LoggerConfiguration()
                 .MinimumLevel.Is(Enum.Parse<LogEventLevel>(configuredMin))
-                .WriteTo.Console();
+                .WriteTo.Console(outputTemplate: "[{Level:u4}] {Message:lj}{NewLine}{Exception}");
+
             Log.Logger = loggerConfig.CreateLogger();
         }
     }
