@@ -11,27 +11,34 @@ namespace BudgetReview.Analyzing
 
         public string GetDisplayString()
         {
-            var sb = new StringBuilder();
+            var output = new StringBuilder();
 
-            var sorted = Transactions
-                .OrderBy(t => t.Category.Name)
-                .ThenByDescending(t => Math.Abs(t.Amount));
+            foreach (var t in SortedTransactions())
+                output.AppendLine(t.ToString());
 
-            foreach (var t in sorted)
-                sb.AppendLine(t.ToString());
+            output.AppendLine();
 
-            sb.AppendLine();
-
-            var categories = Transactions
-                .GroupBy(t => t.Category)
-                .Select(g => new { g.Key.Name, Total = g.Sum(t => t.Amount) })
-                .OrderByDescending(x => Math.Abs(x.Total));
-            foreach (var c in categories)
-                sb.AppendLine($"{c.Name,-14}: {c.Total:C}");
+            foreach (var c in CategoryTotals())
+                output.AppendLine($"{c.Category,-14}: {c.Total:C}");
 
             // TODO: Sum non-income transactions (all expenses)
 
-            return sb.ToString();
+            return output.ToString();
+        }
+
+        private IOrderedEnumerable<Transaction> SortedTransactions()
+        {
+            return Transactions
+                .OrderBy(t => t.Category.Name)
+                .ThenByDescending(t => Math.Abs(t.Amount));
+        }
+
+        private IOrderedEnumerable<CategoryTotal> CategoryTotals()
+        {
+            return Transactions
+                .GroupBy(t => t.Category)
+                .Select(g => new CategoryTotal(g.Key, g.Sum(t => t.Amount)))
+                .OrderByDescending(x => Math.Abs(x.Total));
         }
     }
 }
