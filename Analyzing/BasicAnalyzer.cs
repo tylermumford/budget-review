@@ -74,7 +74,8 @@ namespace BudgetReview.Analyzing
         {
             public void ApplyTo(Transaction t)
             {
-                t.Category = Category.ByName(CategoryName);
+                // Set the Transaction's Category to the CategoryName from the BasicIdea.
+                t.Category = Analyzing.CategoryName.Of(CategoryName);
 
                 if (NewDescription != null)
                     t.Description = NewDescription;

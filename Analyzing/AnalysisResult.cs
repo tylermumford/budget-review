@@ -29,7 +29,7 @@ namespace BudgetReview.Analyzing
         private IOrderedEnumerable<Transaction> SortedTransactions()
         {
             return Transactions
-                .OrderBy(t => t.Category.Name)
+                .OrderBy(t => t.Category)
                 .ThenByDescending(t => Math.Abs(t.Amount));
         }
 

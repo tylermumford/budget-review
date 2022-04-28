@@ -67,7 +67,7 @@ namespace BudgetReview.Analyzing
             var macu = Result.Transactions.Where(t => t.Source == Source.MACU);
             var incomeTransactions = macu.Where(t => t.Amount > 0);
             foreach (var t in incomeTransactions)
-                t.Category = Category.ByName("Income");
+                t.Category = CategoryName.Of("Income");
 
             var substrings = SubstringsThatIdentifyIncome();
             foreach (var t in incomeTransactions.Where(t => t.Description.ContainsAny(substrings)))

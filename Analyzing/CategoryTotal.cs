@@ -1,4 +1,4 @@
 namespace BudgetReview.Analyzing
 {
-    internal record CategoryTotal(Category Category, decimal Total);
+    internal record CategoryTotal(CategoryName Category, decimal Total);
 }
