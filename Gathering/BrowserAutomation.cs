@@ -27,7 +27,7 @@ namespace BudgetReview.Gathering
             {
                 AcceptDownloads = true,
             });
-            var timeout = Convert.ToInt32(Env.Get("default_timeout_ms", "30000"));
+            var timeout = Convert.ToInt32(Env.Get("default_timeout_milliseconds", "30000"));
             Log.Debug("Default timeout: {Timeout}", timeout);
             c.SetDefaultTimeout(timeout);
             c.SetDefaultNavigationTimeout(timeout);
@@ -50,7 +50,7 @@ namespace BudgetReview.Gathering
             browser = await playwright.Firefox.LaunchAsync(new BrowserTypeLaunchOptions
             {
                 Headless = Convert.ToBoolean(Env.Get("headless", "true")),
-                SlowMo = Convert.ToInt32(Env.Get("slow_mo_delay", "0")),
+                SlowMo = Convert.ToInt32(Env.Get("slow_mo_delay_milliseconds", "0")),
             });
         }
     }
