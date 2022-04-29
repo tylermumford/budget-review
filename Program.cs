@@ -2,11 +2,9 @@ using System;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
-using BudgetReview.Analyzing;
-using BudgetReview.Gathering;
-using BudgetReview.Parsing;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Serilog;
 using Serilog.Events;
 
@@ -16,6 +14,9 @@ namespace BudgetReview
     {
         static async Task Main(string[] args)
         {
+            // Hello! This Program class mostly deals with the business of being a program.
+            // The starting point for the program's useful logic is in BudgetReview.Execute.
+
             Env.Load();
             ConfigureLogging();
 
@@ -23,12 +24,18 @@ namespace BudgetReview
 
             EmitDebugInfo();
 
+            var programHost = new HostBuilder()
+                .ConfigureServices(ConfigureServices)
+                .UseConsoleLifetime()
+                .Build();
+
             try
             {
                 var clock = new Stopwatch();
                 clock.Start();
 
-                await PerformBudgetReview();
+                var budgetReview = programHost.Services.GetRequiredService<BudgetReview>();
+                await budgetReview.Execute();
 
                 Log.Debug("Budget review took {Duration} to run", clock.Elapsed);
             }
@@ -38,39 +45,9 @@ namespace BudgetReview
             }
         }
 
-        private static async Task PerformBudgetReview()
+        private static void ConfigureServices(HostBuilderContext _, IServiceCollection services)
         {
-            Console.WriteLine("\n## Gathering...");
-
-            var gatherer = new GatheringRoot();
-            var rawProgramData = await gatherer.Start();
-
-            Log.Information("{RawGatheredData}", rawProgramData);
-            var sourceCount = rawProgramData.Count();
-            var lineCount = rawProgramData.Select(d => d.ContentLines.Length).Sum();
-            Console.WriteLine($"Gathered {lineCount} lines of data from {sourceCount} sources");
-
-            Log.Information("Parsing...");
-
-            var parser = new RootParser();
-            var parsedData = parser.Parse(rawProgramData);
-
-            lineCount = parsedData.Select(d => d.LineItems.Count()).Sum();
-            Console.WriteLine($"Parsed data into {lineCount} transactions");
-
-            Console.WriteLine("\n## Analyzing...");
-
-            var analyzer = new RootAnalyzer(parsedData);
-            var analysis = analyzer.Analyze();
-
-            Log.Information("Analyzed all data");
-            Console.WriteLine(analysis.GetDisplayString());
-
-            Log.Information("Creating output file...");
-
-            analysis.WriteToFile();
-
-            Log.Information("Created output file");
+            services.AddSingleton<BudgetReview>();
         }
 
         private static void EmitDebugInfo()
