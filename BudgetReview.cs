@@ -13,11 +13,13 @@ namespace BudgetReview
     {
         private IGatheringRoot gatherer;
         private IParser parser;
+        private IAnalyzer analyzer;
 
-        public BudgetReview(IGatheringRoot gatheringRoot, IParser parsingRoot)
+        public BudgetReview(IGatheringRoot gatheringRoot, IParser parsingRoot, IAnalyzer analyzingRoot)
         {
             gatherer = gatheringRoot;
             parser = parsingRoot;
+            analyzer = analyzingRoot;
         }
 
         public async Task Execute()
@@ -40,8 +42,7 @@ namespace BudgetReview
 
             Console.WriteLine("\n## Analyzing...");
 
-            var analyzer = new RootAnalyzer(parsedData);
-            var analysis = analyzer.Analyze();
+            var analysis = analyzer.Analyze(parsedData);
 
             Log.Information("Analyzed all data");
             Console.WriteLine(analysis.GetDisplayString());

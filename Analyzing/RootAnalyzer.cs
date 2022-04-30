@@ -6,20 +6,17 @@ using Serilog;
 
 namespace BudgetReview.Analyzing
 {
-    internal class RootAnalyzer
+    internal class RootAnalyzer : IAnalyzer
     {
-        public DataSet<ParsedDataItem> ParsedData { get; init; }
         private readonly AnalysisResult Result = new();
+        private DataSet<ParsedDataItem> ParsedData = new();
 
-        public RootAnalyzer(DataSet<ParsedDataItem> parsedData)
-        {
-            ParsedData = parsedData;
-        }
-
-        public AnalysisResult Analyze()
+        public AnalysisResult Analyze(DataSet<ParsedDataItem> parsedData)
         {
             var s = new Stopwatch();
             s.Start();
+
+            ParsedData = parsedData;
 
             NormalizationAndFilteringStep();
             PaycheckIdentificationStep();

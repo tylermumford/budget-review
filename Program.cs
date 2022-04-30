@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Threading.Tasks;
+using BudgetReview.Analyzing;
 using BudgetReview.Gathering;
 using BudgetReview.Parsing;
 using Microsoft.Extensions.DependencyInjection;
@@ -52,7 +53,8 @@ namespace BudgetReview
             services.AddSingleton<BudgetReview>();
             services
                 .AddTransient<IGatheringRoot, GatheringRoot>()
-                .AddTransient<IParser, RootParser>();
+                .AddTransient<IParser, RootParser>()
+                .AddTransient<IAnalyzer, RootAnalyzer>();
         }
 
         private static void EmitDebugInfo()
