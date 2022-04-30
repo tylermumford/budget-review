@@ -11,11 +11,17 @@ namespace BudgetReview
     /// <summary>This is the "main" logic of the program.</summary>
     internal class BudgetReview
     {
+        private IGatheringRoot gatherer;
+
+        public BudgetReview(IGatheringRoot gatheringRoot)
+        {
+            gatherer = gatheringRoot;
+        }
+
         public async Task Execute()
         {
             Console.WriteLine("\n## Gathering...");
 
-            var gatherer = new GatheringRoot();
             var rawProgramData = await gatherer.Start();
 
             Log.Information("{RawGatheredData}", rawProgramData);

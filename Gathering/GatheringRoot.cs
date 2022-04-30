@@ -8,7 +8,7 @@ using System;
 namespace BudgetReview.Gathering
 {
     ///<summary>Starts all the code that gathers records of money spent.</summary>
-    internal class GatheringRoot
+    internal class GatheringRoot : IGatheringRoot
     {
         private List<IGatherer> gatherers = new();
 

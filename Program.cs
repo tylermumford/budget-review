@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Threading.Tasks;
+using BudgetReview.Gathering;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
@@ -48,6 +49,7 @@ namespace BudgetReview
         private static void ConfigureServices(HostBuilderContext _, IServiceCollection services)
         {
             services.AddSingleton<BudgetReview>();
+            services.AddTransient<IGatheringRoot, GatheringRoot>();
         }
 
         private static void EmitDebugInfo()
