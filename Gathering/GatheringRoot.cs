@@ -4,6 +4,8 @@ using Serilog;
 using BudgetReview.Gathering.Dates;
 using static BudgetReview.Gathering.Dates.DateRange;
 using System;
+using System.Linq;
+using Serilog.Events;
 
 namespace BudgetReview.Gathering
 {
@@ -11,6 +13,10 @@ namespace BudgetReview.Gathering
     internal class GatheringRoot : IGatheringRoot
     {
         private List<IGatherer> gatherers = new();
+
+        private DataSet<RawDataGroup> result = new();
+
+        public GatheringSummary Summary { get; private set; } = new("Haven't gathered yet.");
 
         public Task<DataSet<RawDataGroup>> Start()
         {
@@ -32,7 +38,7 @@ namespace BudgetReview.Gathering
 
         private async Task<DataSet<RawDataGroup>> GatherAll()
         {
-            var result = new DataSet<RawDataGroup>();
+            result = new DataSet<RawDataGroup>();
 
             var tasks = new List<Task>();
             var max = Convert.ToInt32(Env.Get("max_simultaneous_gatherers", "2"));
@@ -55,7 +61,18 @@ namespace BudgetReview.Gathering
             }
             await Task.WhenAll(tasks);
 
+            SetSummary();
+
             return result;
+        }
+
+        private void SetSummary()
+        {
+            var attempted = gatherers.Count;
+            var gotResults = result.Count();
+            var level = (attempted == gotResults) ? LogEventLevel.Information : LogEventLevel.Error;
+
+            Summary = new($"Tried to gather from {attempted} sources, and got results from {gotResults}", level);
         }
     }
 }

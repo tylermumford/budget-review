@@ -47,6 +47,9 @@ namespace BudgetReview
             Log.Information("Analyzed all data");
             Console.WriteLine(analysis.GetDisplayString());
 
+            var summary = gatherer.Summary;
+            Log.Write(summary.Level, summary.Message);
+
             Log.Information("Creating output file...");
 
             analysis.WriteToFile();
