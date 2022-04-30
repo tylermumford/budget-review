@@ -12,10 +12,12 @@ namespace BudgetReview
     internal class BudgetReview
     {
         private IGatheringRoot gatherer;
+        private IParser parser;
 
-        public BudgetReview(IGatheringRoot gatheringRoot)
+        public BudgetReview(IGatheringRoot gatheringRoot, IParser parsingRoot)
         {
             gatherer = gatheringRoot;
+            parser = parsingRoot;
         }
 
         public async Task Execute()
@@ -31,7 +33,6 @@ namespace BudgetReview
 
             Log.Information("Parsing...");
 
-            var parser = new RootParser();
             var parsedData = parser.Parse(rawProgramData);
 
             lineCount = parsedData.Select(d => d.LineItems.Count()).Sum();

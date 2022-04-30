@@ -2,7 +2,7 @@ using System;
 
 namespace BudgetReview.Parsing
 {
-    internal class RootParser
+    internal class RootParser : IParser
     {
         public DataSet<ParsedDataItem> Parse(DataSet<RawDataItem> rawData)
         {
