@@ -4,6 +4,6 @@ namespace BudgetReview.Gathering
 {
     internal interface IGatherer
     {
-        Task GatherInto(DataSet<RawDataItem> results);
+        Task GatherInto(DataSet<RawDataGroup> results);
     }
 }

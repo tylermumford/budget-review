@@ -9,7 +9,7 @@ namespace BudgetReview.Gathering
 {
     internal class CitiCardGatherer : IGatherer
     {
-        public async Task GatherInto(DataSet<RawDataItem> results)
+        public async Task GatherInto(DataSet<RawDataGroup> results)
         {
             var filename = await DownloadAsync();
             var fileLoder = new FileLoader(results, Directory.GetCurrentDirectory());

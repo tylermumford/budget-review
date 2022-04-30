@@ -4,6 +4,6 @@ namespace BudgetReview.Gathering
 {
     internal interface IGatheringRoot
     {
-        Task<DataSet<RawDataItem>> Start();
+        Task<DataSet<RawDataGroup>> Start();
     }
 }

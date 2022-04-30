@@ -2,7 +2,7 @@ using System;
 
 namespace BudgetReview
 {
-    internal class RawDataItem
+    internal class RawDataGroup
     {
         public Source Source { get; set; }
         public string[] ContentLines { get; set; } = Array.Empty<string>();

@@ -9,7 +9,7 @@ namespace BudgetReview.Parsing
 {
     internal static class SourceParser<T> where T : ILineItem
     {
-        public static ParsedDataItem Parse(RawDataItem item, Source source)
+        public static ParsedDataItem Parse(RawDataGroup item, Source source)
         {
             var result = new ParsedDataItem
             {

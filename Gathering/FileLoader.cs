@@ -8,10 +8,10 @@ namespace BudgetReview.Gathering
 {
     internal class FileLoader
     {
-        private readonly DataSet<RawDataItem> Results;
+        private readonly DataSet<RawDataGroup> Results;
         private readonly string SearchDir;
 
-        public FileLoader(DataSet<RawDataItem> results, string searchDir)
+        public FileLoader(DataSet<RawDataGroup> results, string searchDir)
         {
             Results = results;
             SearchDir = searchDir;
@@ -25,7 +25,7 @@ namespace BudgetReview.Gathering
             if (file == null)
                 return;
 
-            var d = new RawDataItem
+            var d = new RawDataGroup
             {
                 Source = source,
                 ContentLines = File.ReadAllLines(file.FullName),

@@ -2,6 +2,6 @@ namespace BudgetReview.Parsing
 {
     internal interface IParser
     {
-        DataSet<ParsedDataItem> Parse(DataSet<RawDataItem> rawData);
+        DataSet<ParsedDataItem> Parse(DataSet<RawDataGroup> rawData);
     }
 }

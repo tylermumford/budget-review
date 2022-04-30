@@ -4,7 +4,7 @@ namespace BudgetReview.Parsing
 {
     internal class RootParser : IParser
     {
-        public DataSet<ParsedDataItem> Parse(DataSet<RawDataItem> rawData)
+        public DataSet<ParsedDataItem> Parse(DataSet<RawDataGroup> rawData)
         {
             var result = new DataSet<ParsedDataItem>();
 
@@ -16,7 +16,7 @@ namespace BudgetReview.Parsing
             return result;
         }
 
-        private void ParseByType(DataSet<ParsedDataItem> result, RawDataItem item)
+        private void ParseByType(DataSet<ParsedDataItem> result, RawDataGroup item)
         {
             ParsedDataItem itemResult;
             switch (item.Source)

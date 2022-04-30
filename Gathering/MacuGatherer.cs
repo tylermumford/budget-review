@@ -9,7 +9,7 @@ namespace BudgetReview.Gathering
 {
     internal class MacuGatherer : IGatherer
     {
-        public async Task GatherInto(DataSet<RawDataItem> results)
+        public async Task GatherInto(DataSet<RawDataGroup> results)
         {
             var filename = await DownloadAsync();
             var fileLoader = new FileLoader(results, Directory.GetCurrentDirectory());

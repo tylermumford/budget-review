@@ -12,7 +12,7 @@ namespace BudgetReview.Gathering
     {
         private List<IGatherer> gatherers = new();
 
-        public Task<DataSet<RawDataItem>> Start()
+        public Task<DataSet<RawDataGroup>> Start()
         {
             Console.WriteLine($"Gathering transactions between {FirstDay.ToIso()} and {LastDay.ToIso()}");
             InstantiateGatherers();
@@ -30,9 +30,9 @@ namespace BudgetReview.Gathering
             gatherers.Add(new ChaseAmazonGatherer());
         }
 
-        private async Task<DataSet<RawDataItem>> GatherAll()
+        private async Task<DataSet<RawDataGroup>> GatherAll()
         {
-            var result = new DataSet<RawDataItem>();
+            var result = new DataSet<RawDataGroup>();
 
             var tasks = new List<Task>();
             var max = Convert.ToInt32(Env.Get("max_simultaneous_gatherers", "2"));
