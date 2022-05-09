@@ -67,9 +67,11 @@ namespace BudgetReview.Gathering
             // Barrier #2: Offer for checking account
             // --------------------------------------
 
-            if (await page.IsVisibleAsync("text=Simplify your life with Everyday Checking"))
+            var isOffering = await page.IsVisibleAsync("text=No Thanks")
+                && await page.IsVisibleAsync("text=Remind me later");
+            if (isOffering)
             {
-                Log.Warning("Offer for a checking account detected! Declining.");
+                Log.Warning("Promotional offer detected! Declining.");
                 await page.ClickAsync("button:text(\"No Thanks\")");
             }
             else
