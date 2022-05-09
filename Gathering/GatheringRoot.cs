@@ -28,12 +28,14 @@ namespace BudgetReview.Gathering
         private void InstantiateGatherers()
         {
             Log.Verbose("Instantiating gatherers");
-            gatherers.Add(new CitiCardGatherer()); // First, since it currently seems less reliable
             gatherers.Add(new AmazonGatherer());
             gatherers.Add(new MacuGatherer());
-            gatherers.Add(new WellsFargoGatherer());
+            gatherers.Add(new WellsFargoGatherer("wells_fargo_username_sarah", "wells_fargo_password_sarah"));
+            gatherers.Add(new WellsFargoGatherer("wells_fargo_username_tyler", "wells_fargo_password_tyler"));
             gatherers.Add(new ChaseCardGatherer());
             gatherers.Add(new ChaseAmazonGatherer());
+            // Citi is out for now, since we're closing that card.
+            ////gatherers.Add(new CitiCardGatherer());
         }
 
         private async Task<DataSet<RawDataGroup>> GatherAll()

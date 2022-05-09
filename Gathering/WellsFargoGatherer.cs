@@ -9,6 +9,19 @@ namespace BudgetReview.Gathering
 {
     internal class WellsFargoGatherer : IGatherer
     {
+        private string usernameKey;
+
+        private string passwordKey;
+
+        /// <summary>
+        /// Gathers transactions from Wells Fargo. Accepts env keys for the username &amp; password.
+        /// </summary>
+        public WellsFargoGatherer(string usernameKey, string passwordKey)
+        {
+            this.usernameKey = usernameKey;
+            this.passwordKey = passwordKey;
+        }
+
         public async Task GatherInto(DataSet<RawDataGroup> results)
         {
             var filename = await DownloadAsync();
@@ -22,8 +35,8 @@ namespace BudgetReview.Gathering
         {
             Log.Information("Downloading Wells Fargo transactions...");
             var url = Env.GetOrThrow("wells_fargo_sign_in_url");
-            var username = Env.GetOrThrow("wells_fargo_username");
-            var password = Env.GetOrThrow("wells_fargo_password");
+            var username = Env.GetOrThrow(usernameKey);
+            var password = Env.GetOrThrow(passwordKey);
 
             var automation = await BrowserAutomationSingleton.SharedInstance;
             var page = await automation.CreatePageAsync();
