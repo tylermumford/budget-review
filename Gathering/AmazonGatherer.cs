@@ -29,28 +29,28 @@ namespace BudgetReview.Gathering
             var automation = await BrowserAutomationSingleton.SharedInstance;
             var page = await automation.CreatePageAsync();
 
-            await page.GotoAsync(Env.GetOrThrow("amazon_sign_in_url"));
+            Log.Debug("Amazon: Loading sign in page");
+            await page.GotoAsync(Env.GetOrThrow("amazon_sign_in_url"),
+                new PageGotoOptions { WaitUntil = WaitUntilState.DOMContentLoaded });
 
-            // Sign in
-            // await page.ClickAsync("#nav-link-accountList");
+            Log.Debug("Amazon: Filling out sign in form");
             await page.FillAsync("#ap_email", username);
             await page.ClickAsync("#continue");
             await page.FillAsync("#ap_password", password);
+
+            Log.Debug("Amazon: Submitting sign in form and waiting for DOMContentLoaded");
             await page.RunAndWaitForNavigationAsync(async () =>
                 await page.ClickAsync("#signInSubmit")
-            );
+            , new PageRunAndWaitForNavigationOptions { WaitUntil = WaitUntilState.DOMContentLoaded });
 
             // Fill out order reports form
-            Log.Debug("Amazon: Filling out the report form");
-            await page.GotoAsync("https://www.amazon.com/gp/b2b/reports?ref_=ya_d_l_order_reports");
-            await Task.WhenAll(
-                page.SelectOptionAsync("#report-month-start", FirstDay.Month.ToString()),
-                page.SelectOptionAsync("#report-day-start", FirstDay.Day.ToString()),
-                page.SelectOptionAsync("#report-year-start", FirstDay.Year.ToString()),
-                page.SelectOptionAsync("#report-month-end", LastDay.Month.ToString()),
-                page.SelectOptionAsync("#report-day-end", LastDay.Day.ToString()),
-                page.SelectOptionAsync("#report-year-end", LastDay.Year.ToString())
-            );
+            Log.Debug("Amazon: Navigating to report form and waiting for DOMContentLoaded");
+            await page.GotoAsync("https://www.amazon.com/gp/b2b/reports",
+                new PageGotoOptions { WaitUntil = WaitUntilState.DOMContentLoaded });
+
+            Log.Debug("Amazon: Filling out report form");
+            await page.FillAsync("#startDateCalendar input", FirstDay.ToShortDateString());
+            await page.FillAsync("#endDateCalendar input", LastDay.ToShortDateString());
 
             // Download the report CSV file
             Log.Debug("Amazon: Downloading");
