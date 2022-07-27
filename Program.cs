@@ -22,6 +22,7 @@ namespace BudgetReview
 
             Env.Load();
             ConfigureLogging();
+            ConfigureWorkingDir();
 
             Console.WriteLine("# Budget Review");
 
@@ -74,6 +75,21 @@ namespace BudgetReview
                 .WriteTo.Console(outputTemplate: "[{Level:u4}] {Message:lj}{NewLine}{Exception}");
 
             Log.Logger = loggerConfig.CreateLogger();
+        }
+
+        private static void ConfigureWorkingDir()
+        {
+            var dir = Env.Get("WORKING_DIRECTORY", ".");
+            try
+            {
+                Environment.CurrentDirectory = dir;
+            }
+            catch (DirectoryNotFoundException)
+            {
+                Log.Warning("Working directory does not exist, creating {CurrentDirectory}", dir);
+                Directory.CreateDirectory(dir);
+                Environment.CurrentDirectory = dir;
+            }
         }
     }
 }
