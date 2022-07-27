@@ -9,6 +9,8 @@ namespace BudgetReview.Gathering
 {
     internal class AmazonGatherer : IGatherer
     {
+        private ILogger Logger = new PrefixedLogger(Log.Logger, "Amazon");
+
         public async Task GatherInto(DataSet<RawDataGroup> results)
         {
             var filename = await DownloadAsync();
@@ -21,7 +23,7 @@ namespace BudgetReview.Gathering
 
         private async Task<string> DownloadAsync()
         {
-            Log.Information("Downloading Amazon transactions...");
+            Logger.Information("Downloading transactions...");
 
             var username = Env.GetOrThrow("amazon_username");
             var password = Env.GetOrThrow("amazon_password");
@@ -29,31 +31,31 @@ namespace BudgetReview.Gathering
             var automation = await BrowserAutomationSingleton.SharedInstance;
             var page = await automation.CreatePageAsync();
 
-            Log.Debug("Amazon: Loading sign in page");
+            Logger.Debug("Loading sign in page");
             await page.GotoAsync(Env.GetOrThrow("amazon_sign_in_url"),
                 new PageGotoOptions { WaitUntil = WaitUntilState.DOMContentLoaded });
 
-            Log.Debug("Amazon: Filling out sign in form");
+            Logger.Debug("Filling out sign in form");
             await page.FillAsync("#ap_email", username);
             await page.ClickAsync("#continue");
             await page.FillAsync("#ap_password", password);
 
-            Log.Debug("Amazon: Submitting sign in form and waiting for DOMContentLoaded");
+            Logger.Debug("Submitting sign in form and waiting for DOMContentLoaded");
             await page.RunAndWaitForNavigationAsync(async () =>
                 await page.ClickAsync("#signInSubmit")
             , new PageRunAndWaitForNavigationOptions { WaitUntil = WaitUntilState.DOMContentLoaded });
 
             // Fill out order reports form
-            Log.Debug("Amazon: Navigating to report form and waiting for DOMContentLoaded");
+            Logger.Debug("Navigating to report form and waiting for DOMContentLoaded");
             await page.GotoAsync("https://www.amazon.com/gp/b2b/reports",
                 new PageGotoOptions { WaitUntil = WaitUntilState.DOMContentLoaded });
 
-            Log.Debug("Amazon: Filling out report form");
+            Logger.Debug("Filling out report form");
             await page.FillAsync("#startDateCalendar input", FirstDay.ToShortDateString());
             await page.FillAsync("#endDateCalendar input", LastDay.ToShortDateString());
 
             // Download the report CSV file
-            Log.Debug("Amazon: Downloading");
+            Logger.Debug("Downloading");
             const int timeout = 45_000;
             var download = await page.RunAndWaitForDownloadAsync
             (
@@ -64,7 +66,7 @@ namespace BudgetReview.Gathering
             await download.SaveAsAsync(filename);
 
             await page.CloseAsync();
-            Log.Information("Finished downloading Amazon transactions into {Filename}", filename);
+            Logger.Information("Finished downloading transactions into {Filename}", filename);
             return filename;
         }
     }
